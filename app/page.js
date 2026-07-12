@@ -23,6 +23,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
   const [tokenData, setTokenData] = useState({});
+  const [copiedWallet, setCopiedWallet] = useState(null);
 
   const loadWallets = useCallback(async () => {
     try {
@@ -61,6 +62,25 @@ export default function Home() {
     }
   }
 
+  async function copyWallet(e, address) {
+    e.stopPropagation(); // supaya klik tombol copy tidak ikut trigger expand row
+    try {
+      await navigator.clipboard.writeText(address);
+    } catch {
+      // fallback untuk browser/webview yang tidak support Clipboard API
+      const textarea = document.createElement("textarea");
+      textarea.value = address;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    setCopiedWallet(address);
+    setTimeout(() => setCopiedWallet((cur) => (cur === address ? null : cur)), 1500);
+  }
+
   const topFive = rows.slice(0, 5);
 
   return (
@@ -72,7 +92,14 @@ export default function Home() {
           ) : (
             [...topFive, ...topFive].map((r, i) => (
               <span className="ticker-item" key={i}>
-                {shortAddr(r.wallet_address)} · {r.total_trades} trades ·{" "}
+                <span
+                  className="ticker-addr"
+                  onClick={(e) => copyWallet(e, r.wallet_address)}
+                  title="Klik untuk copy address"
+                >
+                  {shortAddr(r.wallet_address)}
+                </span>{" "}
+                · {r.total_trades} trades ·{" "}
                 <span className={r.estimated_pnl_usd >= 0 ? "gain" : "loss"}>
                   {formatUsd(r.estimated_pnl_usd)}
                 </span>
@@ -135,7 +162,17 @@ export default function Home() {
                     tabIndex={0}
                   >
                     <td className="addr">
-                      {shortAddr(r.wallet_address)}{" "}
+                      <span className="addr-row">
+                        {shortAddr(r.wallet_address)}
+                        <button
+                          className="copy-btn"
+                          onClick={(e) => copyWallet(e, r.wallet_address)}
+                          title="Copy wallet address"
+                          aria-label="Copy wallet address"
+                        >
+                          {copiedWallet === r.wallet_address ? "✓ Disalin" : "⧉ Copy"}
+                        </button>
+                      </span>{" "}
                       {r.avg_trades_per_day >= 5 && (
                         <span className="badge">HIGH FREQ</span>
                       )}
@@ -153,7 +190,7 @@ export default function Home() {
                     <tr className="token-detail">
                       <td colSpan={7}>
                         {!tokenData[r.wallet_address] ? (
-                          "Memuat breakdown token..."
+                          "Menjalankan query di Dune untuk wallet ini... (bisa 5-20 detik)"
                         ) : tokenData[r.wallet_address].length === 0 ? (
                           "Tidak ada breakdown token tersedia."
                         ) : (

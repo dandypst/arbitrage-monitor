@@ -147,6 +147,45 @@ tbody tr:hover {
   font-weight: 500;
 }
 
+.addr-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.copy-btn:hover {
+  border-color: var(--mint);
+  color: var(--mint);
+}
+
+.copy-btn:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+}
+
+.ticker-addr {
+  cursor: pointer;
+  border-bottom: 1px dotted var(--text-dim);
+}
+
+.ticker-addr:hover {
+  color: var(--mint);
+  border-bottom-color: var(--mint);
+}
+
 .pnl-pos { color: var(--mint); font-weight: 700; }
 .pnl-neg { color: var(--coral); font-weight: 700; }
 
