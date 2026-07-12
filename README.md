@@ -5,15 +5,22 @@ menarik data dari query Dune Analytics kamu secara berkala.
 
 ## 1. Siapkan query di Dune
 
-1. Buat 2 query di dune.com menggunakan SQL yang sudah diberikan sebelumnya:
-   - Query A: "wallet summary" (total trades, active days, estimated PNL)
-   - Query B: "token breakdown per wallet"
-2. Jalankan tiap query minimal sekali supaya ada hasil ter-cache.
-3. **Penting:** aktifkan **scheduled refresh** di tiap query (klik ikon jam di query editor Dune)
-   supaya datanya ter-update otomatis, misalnya tiap 1 jam. Tanpa ini, dashboard hanya
-   akan menampilkan hasil dari eksekusi terakhir yang kamu jalankan manual.
-4. Catat **Query ID** masing-masing (angka di URL, contoh: dune.com/queries/**1234567**).
-5. Buat API key di https://dune.com/settings/api.
+1. Buat 2 query di dune.com:
+   - **Query A** ("wallet summary") — pakai SQL biasa (yang sudah diberikan di awal chat), untuk leaderboard utama.
+   - **Query B** ("token breakdown") — **wajib pakai versi parameterized**, ada di file
+     `query_B_token_breakdown_parameterized.sql` di folder ini. Ini beda dari versi awal:
+     filter wallet dilakukan langsung di SQL lewat parameter `{{wallet_address}}`,
+     bukan ditarik semua lalu difilter di aplikasi. Kalau masih pakai versi lama, wallet
+     dengan trade sangat banyak (contoh: wallet dengan >20rb trades) bisa saja datanya
+     tidak muncul saat di-klik karena kepotong limit baris.
+2. Untuk Query B: buka query editor Dune → klik ikon parameter (+) → tambahkan parameter
+   `Text` bernama **wallet_address** → save.
+3. Jalankan tiap query minimal sekali (Query B bisa diisi contoh address dulu) supaya tidak error.
+4. **Penting:** aktifkan **scheduled refresh** khusus untuk **Query A** (klik ikon jam di query editor)
+   supaya leaderboard-nya ter-update otomatis, misalnya tiap 1 jam. Query B TIDAK perlu scheduled
+   refresh karena akan dieksekusi on-demand tiap kali user klik wallet di web app.
+5. Catat **Query ID** masing-masing (angka di URL, contoh: dune.com/queries/**1234567**).
+6. Buat API key di https://dune.com/settings/api.
 
 ## 2. Setup lokal
 
@@ -46,13 +53,17 @@ Ikuti prompt-nya, lalu saat ditanya environment variables, masukkan:
 
 ## 4. Catatan soal "realtime"
 
-- Data ini **bukan realtime murni** — frekuensinya mengikuti scheduled refresh di Dune (poin 1.3)
-  dan polling di frontend (default tiap 60 detik, bisa diubah di `REFRESH_MS` pada `app/page.js`).
-- Endpoint `/api/wallets` dan `/api/tokens` mengambil hasil **cache** Dune (`GET /query/{id}/results`),
-  bukan trigger eksekusi baru setiap request — ini supaya tidak boros credit Dune API.
-- Kalau butuh update lebih cepat dari itu, kamu bisa modifikasi API route untuk trigger eksekusi
-  manual (`POST /query/{id}/execute`) lalu polling status — tapi ini menghabiskan credit lebih banyak,
-  jadi pertimbangkan trade-off-nya.
+- Data leaderboard (Query A) **bukan realtime murni** — frekuensinya mengikuti scheduled refresh
+  di Dune (poin 1.4) dan polling di frontend (default tiap 60 detik, bisa diubah di `REFRESH_MS`
+  pada `app/page.js`).
+- Endpoint `/api/wallets` mengambil hasil **cache** Dune (`GET /query/{id}/results`), tidak
+  trigger eksekusi baru tiap request — hemat credit.
+- Endpoint `/api/tokens` (breakdown per token) **berbeda** — karena pakai parameter wallet_address,
+  setiap kali user klik/expand sebuah wallet, aplikasi **trigger eksekusi baru** di Dune
+  (`POST /query/{id}/execute` lalu polling hasil). Ini memakai credit Dune API tiap klik.
+  Kalau trafficnya tinggi, pertimbangkan menambah caching sederhana di server (misal simpan
+  hasil per wallet selama beberapa menit) supaya klik berulang ke wallet yang sama tidak
+  trigger eksekusi baru terus-menerus.
 
 ## 5. Batasan data
 
