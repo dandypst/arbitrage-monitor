@@ -1,0 +1,216 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --bg: #0b0e0f;
+  --bg-panel: #12171a;
+  --line: #223035;
+  --text: #e7ede9;
+  --text-dim: #7c8f8a;
+  --mint: #4fd1a0;
+  --coral: #ef7d6b;
+  --amber: #e0b352;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+h1, h2, h3, .display {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+.ticker-wrap {
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-panel);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 8px 0;
+}
+
+.ticker-track {
+  display: inline-block;
+  animation: scroll 30s linear infinite;
+  padding-left: 100%;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.ticker-item {
+  display: inline-block;
+  margin-right: 40px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.ticker-item .gain { color: var(--mint); }
+.ticker-item .loss { color: var(--coral); }
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin: 4px 0 32px;
+}
+
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mint);
+  margin-right: 6px;
+  box-shadow: 0 0 0 0 rgba(79,209,160,0.5);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(79,209,160,0.5); }
+  70% { box-shadow: 0 0 0 6px rgba(79,209,160,0); }
+  100% { box-shadow: 0 0 0 0 rgba(79,209,160,0); }
+}
+
+.status-line {
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+tbody td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+tbody tr {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+tbody tr:hover {
+  background: var(--bg-panel);
+}
+
+.addr {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.pnl-pos { color: var(--mint); font-weight: 700; }
+.pnl-neg { color: var(--coral); font-weight: 700; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  background: rgba(224,179,82,0.12);
+  color: var(--amber);
+  border: 1px solid rgba(224,179,82,0.3);
+}
+
+.token-detail {
+  background: var(--bg-panel);
+}
+
+.token-detail td {
+  padding: 16px 12px 20px 32px;
+}
+
+.token-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 12.5px;
+}
+
+.token-row:last-child { border-bottom: none; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-dim);
+}
+
+.error-box {
+  border: 1px solid var(--coral);
+  background: rgba(239,125,107,0.08);
+  color: var(--coral);
+  padding: 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+.refresh-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.refresh-btn:hover {
+  border-color: var(--mint);
+  color: var(--mint);
+}
+
+.refresh-btn:focus-visible, tbody tr:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+}
